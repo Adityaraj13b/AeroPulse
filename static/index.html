@@ -114,30 +114,74 @@ canvas{width:100%;height:250px;background:#081424;border:1px solid #1e334f;borde
   .actions button{max-width:none}
 }
 </style>
+<link rel="stylesheet" href="/static/stitch-theme.css" />
 </head>
 
 <body>
+<nav class="gcs-rail" aria-label="Dashboard sections">
+  <a class="rail-logo" href="#overview" aria-label="AeroPulse overview">
+    <span class="rail-logo-mark" aria-hidden="true"></span>
+  </a>
+  <a class="rail-link active" href="#overview" title="Mission twin">
+    <span class="rail-code">MT</span>
+    <span>Mission<br>Twin</span>
+  </a>
+  <a class="rail-link" href="#diagnostics" title="Diagnostics">
+    <span class="rail-code">DX</span>
+    <span>Diagnostics</span>
+  </a>
+  <a class="rail-link" href="#analytics" title="Health analytics">
+    <span class="rail-code">HA</span>
+    <span>Health<br>Analytics</span>
+  </a>
+  <a class="rail-link" href="#telemetry-panel" title="Telemetry">
+    <span class="rail-code">TL</span>
+    <span>Telemetry</span>
+  </a>
+  <a class="rail-link" href="#model-validation" title="Model validation">
+    <span class="rail-code">MV</span>
+    <span>Validation</span>
+  </a>
+  <span class="rail-classification">SIH<br>R&amp;D</span>
+</nav>
+
 <div class="shell">
 
-  <div class="top">
+  <div class="top" id="overview">
     <div class="brand">
-      <h1>AeroPulse-X</h1>
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div>
+      <h1>AeroPulse-X <span>GCS</span></h1>
       <div class="sub">
         Mission-Aware AI Digital Twin • MALE-UAV Aero-Piston Propulsion • SIH26054
       </div>
+      </div>
     </div>
 
-    <div class="badges">
-      <span id="serverBadge" class="badge">Checking system…</span>
-      <span class="badge">Research Prototype</span>
-      <span class="badge">GCS Decision Support</span>
+    <div class="mission-meta">
+      <div class="meta-block">
+        <span>Mission</span>
+        <strong>MALE-UAV-XI</strong>
+      </div>
+      <div class="meta-block readiness">
+        <span>AI readiness</span>
+        <strong id="serverBadge" class="badge">Checking system…</strong>
+      </div>
+      <div class="meta-block">
+        <span>UTC time</span>
+        <strong id="utcClock">-- --- ---- --:--:--</strong>
+      </div>
+      <div class="badges">
+        <span class="badge">Research Prototype</span>
+        <span class="badge">GCS Decision Support</span>
+      </div>
     </div>
   </div>
 
   <div id="setupNotice" class="notice hidden"></div>
 
   <!-- UAV Hardware & Flight Envelope Simulation Console -->
-  <div class="hw-banner">
+  <div class="hw-banner" id="mission-console">
     <div style="width:100%;">
       <div class="hw-title">
         <span>⚙️</span> Localhost UAV Hardware & Flight Envelope Simulator
@@ -369,7 +413,7 @@ canvas{width:100%;height:250px;background:#081424;border:1px solid #1e334f;borde
   </div>
 
   <!-- KPI Summary Cards -->
-  <div class="grid kpis">
+  <div class="grid kpis" id="analytics">
     <div class="card">
       <div class="kpi-label">Engine Health</div>
       <div id="health" class="kpi">—</div>
@@ -470,7 +514,7 @@ canvas{width:100%;height:250px;background:#081424;border:1px solid #1e334f;borde
   </div>
 
   <!-- Diagnostics, Sensor Trust & Dominant Deviations -->
-  <div class="grid three">
+  <div class="grid three" id="diagnostics">
     <div class="card">
       <h2>AI Diagnostics</h2>
       <div id="faults">Run a scenario.</div>
@@ -509,7 +553,7 @@ canvas{width:100%;height:250px;background:#081424;border:1px solid #1e334f;borde
   </div>
 
   <!-- Telemetry & Expected Comparison -->
-  <div class="grid two">
+  <div class="grid two" id="telemetry-panel">
     <div class="card">
       <h2>Observed Telemetry</h2>
 
@@ -540,12 +584,12 @@ canvas{width:100%;height:250px;background:#081424;border:1px solid #1e334f;borde
   </div>
 
   <!-- Model Validation Panel -->
-  <div id="metricsCard" class="card hidden">
+  <div id="metricsCard" class="card hidden model-validation-panel">
     <h2>Model Validation</h2>
     <div id="metrics"></div>
   </div>
 
-  <div class="card">
+  <div class="card" id="model-validation">
     <h2>System Architecture</h2>
     <pre style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:#b8d5ff; background:#081424; border:1px solid #1e334f; border-radius:10px; padding:12px; font-size:12px; line-height:1.5; overflow-x:auto;">
 ECU / FADEC / CAN / Simulated Telemetry
@@ -572,6 +616,32 @@ Mission What-If Optimization + Military Maintenance Advisory System
 
 <script>
 const $=id=>document.getElementById(id);
+
+function updateUtcClock(){
+  const now=new Date();
+  const value=now.toLocaleString('en-GB',{
+    timeZone:'UTC',
+    day:'2-digit',
+    month:'short',
+    year:'numeric',
+    hour:'2-digit',
+    minute:'2-digit',
+    second:'2-digit',
+    hour12:false
+  }).replace(',', '').toUpperCase();
+  const clock=$('utcClock');
+  if(clock) clock.textContent=value+' UTC';
+}
+
+document.querySelectorAll('.rail-link').forEach(link=>{
+  link.addEventListener('click',()=>{
+    document.querySelectorAll('.rail-link').forEach(item=>item.classList.remove('active'));
+    link.classList.add('active');
+  });
+});
+
+updateUtcClock();
+setInterval(updateUtcClock,1000);
 
 const hwState = {
   throttle: 60,
